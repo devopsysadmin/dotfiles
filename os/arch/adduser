@@ -1,0 +1,9 @@
+#!/bin/sh -e
+USERNAME=$1 ; shift
+INGROUPS=$@
+if [ `whoami` = 'root' ]; then
+  echo "usermod -G $INGROUPS -a $USERNAME"
+  usermod -G $INGROUPS -a $USERNAME
+else
+  sudo $0 $USERNAME $INGROUPS
+fi
