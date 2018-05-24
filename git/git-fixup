@@ -12,4 +12,4 @@ done < $TMP
 rm $TMP
 
 echo $commit
-git rebase -i $commit
+git rebase -i $commit && git push --force
