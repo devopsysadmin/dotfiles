@@ -1,0 +1,15 @@
+#!/bin/bash
+TMP="/tmp/git_fixup_$(date +%s)"
+git log --oneline --no-decorate -n50 > $TMP
+prev=0
+
+while read line; do
+  commit=$(echo "$line" | cut -d ' ' -f1)
+  comment=$(echo "$line" | cut -d ' ' -f2- )
+  [[ $prev -gt 0 ]] && break
+  [[ "$comment" != "_" ]] && prev=1
+done < $TMP
+rm $TMP
+
+echo $commit
+git rebase -i $commit
