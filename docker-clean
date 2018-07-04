@@ -1,0 +1,10 @@
+#!/bin/sh
+VOLUMES=$(docker volume ls -qf dangling=true)
+IMAGES_UNUSED=$(docker images --filter "dangling=true" -q --no-trunc)
+IMAGES_UNTAGGED=$(docker images | grep "none" | awk '/ / { print $3 }')
+CONTAINERS=$(docker ps -qa --no-trunc --filter "status=exited")
+
+[[ $VOLUMES ]] && docker volume ls -qf dangling=true | xargs -r docker volume rm
+[[ $IMAGES_UNUSED ]] && docker rmi -f "$IMAGES_UNUSED"
+[[ $IMAGES_UNTAGGED ]] && docker rmi "$IMAGES_UNTAGGED"
+[[ $CONTAINERS ]] && docker rm "$CONTAINERS"
