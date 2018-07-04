@@ -30,9 +30,15 @@ git_pull_upstream(){
     git branch --set-upstream-to="origin/$_branch" "$_branch" ; git pull
 }
 
+git_branch_delete(){
+    local _branch="$1"
+    git branch -D "${_branch}" && git push origin :"${_branch}"
+}
+
 BRANCH="$(git_current_branch)"
 case $(basename $0) in
     gbc) echo "$BRANCH" ;;
+    gbd) git_branch_delete "$1" ;;
     gps) git push --set-upstream origin "$BRANCH" ;;
     gls) git_pull_upstream "$BRANCH" ;;
     git-clean-conflict) find . -name "*_BACKUP_*" -o -name "*_LOCAL_*" -o -name "*_BASE_*" -o -name "*_REMOTE_*" | xargs rm ;;
