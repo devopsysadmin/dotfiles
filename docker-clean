@@ -5,6 +5,6 @@ IMAGES_UNTAGGED=$(docker images | grep "none" | awk '/ / { print $3 }')
 CONTAINERS=$(docker ps -qa --no-trunc --filter "status=exited")
 
 [[ $VOLUMES ]] && docker volume ls -qf dangling=true | xargs -r docker volume rm
-[[ $IMAGES_UNUSED ]] && docker rmi -f "$IMAGES_UNUSED"
-[[ $IMAGES_UNTAGGED ]] && docker rmi "$IMAGES_UNTAGGED"
-[[ $CONTAINERS ]] && docker rm "$CONTAINERS"
+[[ $IMAGES_UNUSED ]] && for image in $IMAGES_UNUSED; do docker rmi -f "$image" ; done
+[[ $IMAGES_UNTAGGED ]] && for image in $IMAGES_UNTAGGED; do docker rmi -f "$image"; done
+[[ $CONTAINERS ]] && for container in $CONTAINERS; do docker rm "$container"; done
