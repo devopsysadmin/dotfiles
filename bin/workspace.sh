@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 WORKSPACE_DIR=$HOME/.config/workspaces
 TMP="/tmp/$(date +workspace.%s)"
 
@@ -104,10 +104,26 @@ ACTION=$1
 WORKSPACE=$2
 
 case $ACTION in
-	enable) workspace_enable $WORKSPACE; echo $TMP ;;
-	disable) workspace_disable $WORKSPACE; echo $TMP ;;
+	enable)
+		if workspace_search $WORKSPACE; then
+			workspace_enable $WORKSPACE
+			echo $TMP
+		else
+			>&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
+			exit 1
+		fi
+		;;
+	disable)
+		if workspace_search $WORKSPACE; then
+			workspace_disable $WORKSPACE
+			echo $TMP
+		else
+			>&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
+			exit 1
+		fi
+		;;
 	create) workspace_create $WORKSPACE ;;
 	edit) workspace_create $WORKSPACE ;;
-	help) workspace_help && return 0 ;;
-	*) workspace_help && return 1 ;;
+	help) workspace_help && exit 0 ;;
+	*) workspace_help && exit 1 ;;
 esac
