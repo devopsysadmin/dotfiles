@@ -1,0 +1,4 @@
+workspace(){
+	filename=$($HOME/.local/bin/workspace.sh $@)
+	[[ -z $filename ]] || source $filename
+}

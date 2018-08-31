@@ -32,7 +32,8 @@ git_pull_upstream(){
 
 git_branch_delete(){
     local _branch="$1"
-    git branch -D "${_branch}" && git push origin :"${_branch}"
+    git branch -D "${_branch}" || true
+    git push origin :"${_branch}"
 }
 
 git_fetch_prune_local(){
