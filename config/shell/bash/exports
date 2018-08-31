@@ -1,0 +1,10 @@
+#!/bin/sh
+_color_reset='\e[0m'
+_color_green_bold='\e[01;32m'
+_color_yellow_bold='\e[01;33m'
+_color_blue_bold='\e[01;34m'
+_color_brown='\e[00;33m'
+
+export PS1=$"[\D{%T} $_color_green_bold\u@$_color_yellow_bold\h$_color_reset] $_color_blue_bold\$PWD $_color_brown\$(git_branch)$_color_reset\n▶ "
+export LANG=en_US.UTF8
+export PATH=$HOME/.local/bin:$HOME/.local/bin/git:$HOME/.local/bin/os/osx:/usr/local/bin:$PATH

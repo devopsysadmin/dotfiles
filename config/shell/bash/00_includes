@@ -1,0 +1,10 @@
+git_branch(){
+    local _branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ $_branch ]; then
+        if [ $(git status --porcelain -b 2>/dev/null | egrep -c '^ M') -gt 0 ]; then
+            echo -n "$_branch *"
+        else
+            echo -n "$_branch"
+        fi
+    fi
+}

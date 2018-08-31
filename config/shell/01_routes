@@ -1,0 +1,13 @@
+function OsPath(){
+  if [ -f /etc/os-release ]; then
+    local ID=$(egrep '^ID=' /etc/os-release | cut -d "=" -f2)
+  fi
+  case $ID in
+    neon|ubuntu|debian) echo debian ;;
+    manjaro|arch) echo arch ;;
+    *) echo generic;;
+  esac
+}
+
+export PATH=$HOME/.local/bin:$HOME/.local/bin/git:$HOME/.local/bin/os/$(OsPath):$HOME/.local/opt/cargo/bin:/usr/local/sbin:/usr/local/bin:$PATH
+export WORKON_HOME=~/.local/share/virtualenv
