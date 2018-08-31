@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 WORKSPACE_DIR=$HOME/.config/workspaces
 TMP="/tmp/$(date +workspace.%s)"
 
@@ -15,7 +15,7 @@ workspace_usage(){
 workspace_enable(){
 	echo '#!/bin/bash +x' > $TMP
 	source $WORKSPACE_DIR/$1
-	[[ -z $PYTHON ]] || workspace_enable_python $PYTHON
+	[[ -z $PYTHON ]] || workspace_enable_python $PYTHON $1
 	[[ -z $RUBY ]] || workspace_enable_ruby $RUBY
 	if [ $NODE ] || [ $NPM ]; then
 		workspace_enable_nvm
@@ -26,14 +26,16 @@ workspace_enable(){
 }
 
 workspace_enable_python(){
+	local _pyver=$(which python$1)
+	local _ws=$2
 	for VE in \
 	  $HOME/.local/bin/virtualenvwrapper.sh \
 	  /usr/bin/virtualenvwrapper.sh \
-	  /usr/local/bin/virtualenvwrapper.sh
-	do
+	  /usr/local/bin/virtualenvwrapper.sh \
+	;do
 	  [[ -f $VE ]] && echo "source $VE" >> $TMP && break
 	done
-	echo "workon $VE" >> $TMP
+	echo "workon $_ws || mkvirtualenv -p $_pyver $_ws" >> $TMP
 }
 
 workspace_enable_nvm(){
@@ -92,7 +94,7 @@ workspace_create(){
 	echo "RUBY=$RUBY" >> $fn
 	echo "NODE=$NODE" >> $fn
 	echo "NPM=$NPM" >> $fn
-	echo -n "Enable now (y/N)?" ; read ENABLE
+	>&2 echo -n "Enable now (y/N)?" ; read ENABLE
 	([[ $ENABLE == 'y' ]] || [[ $ENABLE == 'Y' ]]) && workspace_enable $1
 }
 
