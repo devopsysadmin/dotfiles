@@ -36,9 +36,9 @@ git_branch_delete(){
     git push origin :"${_branch}"
 }
 
-git_fetch_prune_local(){
-    git branch -vv | grep 'gone]' | awk '{print $1}' | xargs git branch -d
-}
+git_fetch_prune_local(){ git branch -vv | grep 'gone]' | awk '{print $1}' | xargs git branch -d ;}
+
+git_commit_dirty(){ git add -A . && git commit -m '_' && git push ;}
 
 BRANCH="$(git_current_branch)"
 case $(basename $0) in
@@ -51,4 +51,5 @@ case $(basename $0) in
     gci) git_commit_issue "$BRANCH" "$@";;
     gco) git checkout $@ ;;
     gfp) git_fetch_prune_local ;;
+	gcd) git_commit_dirty ;;
 esac

@@ -1,10 +1,15 @@
 #!/bin/sh
+
+## Find GNU/xargs binary
+xargs=$(which gxargs)
+[[ -z $xargs ]] && xargs=$(which xargs)
+
 VOLUMES=$(docker volume ls -qf dangling=true)
 IMAGES_UNUSED=$(docker images --filter "dangling=true" -q --no-trunc)
 IMAGES_UNTAGGED=$(docker images | grep "none" | awk '/ / { print $3 }')
 CONTAINERS=$(docker ps -qa --no-trunc --filter "status=exited")
 
-[[ $VOLUMES ]] && docker volume ls -qf dangling=true | xargs -r docker volume rm
+[[ $VOLUMES ]] && docker volume ls -qf dangling=true | $xargs -r docker volume rm
 [[ $IMAGES_UNUSED ]] && for image in $IMAGES_UNUSED; do docker rmi -f "$image" ; done
 [[ $IMAGES_UNTAGGED ]] && for image in $IMAGES_UNTAGGED; do docker rmi -f "$image"; done
 [[ $CONTAINERS ]] && for container in $CONTAINERS; do docker rm "$container"; done

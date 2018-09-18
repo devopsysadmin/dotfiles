@@ -1,131 +1,167 @@
-#!/bin/bash -x
+#!/bin/bash
 WORKSPACE_DIR=$HOME/.config/workspaces
 TMP="/tmp/$(date +workspace.%s)"
 
-workspace_usage(){
-	echo '
-	Enables|Disables python+ruby+node versions for a given workspace
+PYTHON_DEFAULT=3
 
-	Usage: workspace ACTION WORKSPACE
-	ACTION - enable|disable|create|edit
-	WORKSPACE - name of the workspace to run
-	'
+Workspace.usage(){
+    >&2 echo '
+    Enables|Disables python+ruby+node versions for a given workspace
+
+    Usage: workspace ACTION WORKSPACE
+    ACTION - enable|disable|create|edit|delete
+    WORKSPACE - name of the workspace to run
+    '
 }
 
-workspace_enable(){
-	echo '#!/bin/bash +x' > $TMP
-	source $WORKSPACE_DIR/$1
-	[[ -z $PYTHON ]] || workspace_enable_python $PYTHON $1
-	[[ -z $RUBY ]] || workspace_enable_ruby $RUBY
-	if [ $NODE ] || [ $NPM ]; then
-		workspace_enable_nvm
-		[[ -z $NODE ]] || workspace_enable_node $NODE
-		[[ -z $NPM ]] || workspace_enable_npm $NPM
-	fi
-	echo 'rm -f $0' >> $TMP
+Workspace.enable(){
+    echo '#!/bin/bash -x' > $TMP
+    source $WORKSPACE_DIR/$WORKSPACE
+    echo "WORKSPACE=$WORKSPACE" >> $TMP
+    echo "source $PYTHON_SCRIPT" >> $TMP
+    echo "source $RUBY_SCRIPT" >> $TMP
+    echo "source $NODE_SCRIPT" >> $TMP
+    [[ -z $PYTHON ]] && PYTHON=3 ; Python.enable $PYTHON $1 >> $TMP
+    [[ -z $RUBY ]] || Ruby.enable $RUBY >> $TMP
+    if [ $NODE ] || [ $NPM ]; then Node.enable $NODE $NPM >> $TMP; fi
+    echo 'rm -f $0' >> $TMP
 }
 
-workspace_enable_python(){
-	local _pyver=$(which python$1)
-	local _ws=$2
-	for VE in \
-	  $HOME/.local/bin/virtualenvwrapper.sh \
-	  /usr/bin/virtualenvwrapper.sh \
-	  /usr/local/bin/virtualenvwrapper.sh \
-	;do
-	  [[ -f $VE ]] && echo "source $VE" >> $TMP && break
-	done
-	echo "workon $_ws || mkvirtualenv -p $_pyver $_ws" >> $TMP
-}
-
-workspace_enable_nvm(){
-    for NVM in \
-		$HOME/.local/share/nvm/nvm.sh \
-		/usr/share/nvm/init-nvm.sh \
-		/usr/local/opt/nvm/nvm.sh \
+Python.find(){
+    for VE in \
+        $HOME/.local/bin/virtualenvwrapper.sh \
+        /usr/bin/virtualenvwrapper.sh \
+        /usr/local/bin/virtualenvwrapper.sh \
     ;do
-        [[ -f $NVM ]] && echo "source $NVM" >> $TMP && break
+        [[ -f $VE ]] && echo "$VE" && break
     done
 }
 
-workspace_enable_node(){
-	echo "nvm use $1" >> $TMP
+Python.enable(){
+	local _pyver=$1
+    local _pybin=$(which python$_pyver)
+    local _ws=$2
+    echo "echo Using python$_pyver in $_ws virtualenv"
+    echo "workon $_ws || mkvirtualenv -p $_pybin $_ws"
 }
 
-workspace_enable_npm(){
-	echo "npm_current=\$(npm -v)" >> $TMP
-	echo "[[ \$npm_current != '$1' ]] && npm install -g npm@$1" >> $TMP
+Python.disable(){
+    echo "deactivate"
 }
 
-workspace_enable_ruby(){
-	for RVM in \
-		$HOME/.local/share/rvm/scripts/rvm \
-		/usr/share/rvm/scripts/rvm /etc/profile.d/rvm.sh \
-	;do
-		[[ -f $RVM ]] && echo "source $RVM" >> $TMP && break
-	done
-	echo "rvm use $1 || (rvm install $1 && rvm use $1)" >> $TMP
+Python.delete(){
+    echo 'rm $WORKON_HOME' >> $TMP
 }
 
-workspace_disable(){
-	return 0
+Node.find(){
+    for NVM in \
+        $HOME/.local/share/nvm/nvm.sh \
+        /usr/share/nvm/init-nvm.sh \
+        /usr/local/opt/nvm/nvm.sh \
+    ;do
+        [[ -f $NVM ]] && echo "$NVM" && break
+    done
 }
 
-workspace_input(){
-	local _question=$1
-	local _defaults=$2
-	[[ -z $_defaults ]] || _question+=" ($_defaults)"
-	_question+='? '
-	>&2 echo -n "$_question"
-	read OPTION
-	[[ -n $_defaults ]] && [[ -z $OPTION ]] && OPTION=$_defaults
-	echo $OPTION
+Node.enable(){
+    local _node=$1
+    local _npm=$2
+    echo "nvm use v$_node
+    npm_current=\$(npm -v)
+    [[ \$npm_current != '$_npm' ]] && npm install -g npm@$_npm"
 }
 
-workspace_create(){
-	local fn="$WORKSPACE_DIR/$1"
-	[[ -f $fn ]] && source $fn
-	PYTHON=$(workspace_input 'Python' $PYTHON)
-	RUBY=$(workspace_input 'Ruby' $RUBY)
-	NODE=$(workspace_input 'Node' $NODE)
-	NPM=$(workspace_input 'Npm' $NPM)
-	echo '' > $fn
-	echo "PYTHON=$PYTHON" >> $fn
-	echo "RUBY=$RUBY" >> $fn
-	echo "NODE=$NODE" >> $fn
-	echo "NPM=$NPM" >> $fn
-	>&2 echo -n "Enable now (y/N)?" ; read ENABLE
-	([[ $ENABLE == 'y' ]] || [[ $ENABLE == 'Y' ]]) && workspace_enable $1
+Node.disable(){
+    echo "nvm use default"
 }
 
-workspace_search(){
-	[[ -f $WORKSPACE_DIR/$1 ]] || return 1
+Ruby.find(){
+    for RVM in \
+        $HOME/.local/share/rvm/scripts/rvm \
+        /usr/share/rvm/scripts/rvm /etc/profile.d/rvm.sh \
+    ;do
+        [[ -f $RVM ]] && echo "$RVM" && break
+    done
+}
+
+Ruby.enable(){
+    echo "rvm use $1 || (rvm install $1 && rvm use $1)"
+}
+
+Ruby.disable(){
+    echo "rvm use system"
+}
+
+Workspace.disable(){
+    Node.disable >> $TMP
+    Ruby.disable >> $TMP
+    Python.disable >> $TMP
+    echo "export WORKSPACE=" >> $TMP
+}
+
+Workspace.input(){
+    local _question=$1
+    local _defaults=$2
+    [[ -z $_defaults ]] || _question+=" ($_defaults)"
+    _question+='? '
+    >&2 echo -n "$_question"
+    read OPTION
+    [[ -n $_defaults ]] && [[ -z $OPTION ]] && OPTION=$_defaults
+    echo $OPTION
+}
+
+Workspace.create(){
+    local fn="$WORKSPACE_DIR/$WORKSPACE"
+    [[ -f $fn ]] && source $fn
+    PYTHON=$(Workspace.input "Python (default $PYTHON_DEFAULT)" $PYTHON) ; [[ -z $PYTHON ]] && PYTHON=$PYTHON_DEFAULT
+    RUBY=$(Workspace.input 'Ruby' $RUBY)
+    NODE=$(Workspace.input 'Node' $NODE)
+    NPM=$(Workspace.input 'Npm' $NPM)
+    echo "WORKSPACE=$WORKSPACE" > $f
+    echo "PYTHON_SCRIPT=$(Python.find)" >> $fn
+    echo "RUBY_SCRIPT=$(Ruby.find)" >> $fn
+    echo "NODE_SCRIPT=$(Node.find)" >> $fn
+    echo "PYTHON=$PYTHON" >> $fn
+    echo "RUBY=$RUBY" >> $fn
+    echo "NODE=$NODE" >> $fn
+    echo "NPM=$NPM" >> $fn
+}
+
+Workspace.search(){
+    [[ -f $WORKSPACE_DIR/$1 ]] || return 1
+}
+
+Workspace.delete(){
+    Python.delete
 }
 
 ACTION=$1
-WORKSPACE=$2
+WORKSPACE=${2:-$WORKSPACE}
 
 case $ACTION in
-	enable)
-		if workspace_search $WORKSPACE; then
-			workspace_enable $WORKSPACE
-			echo $TMP
-		else
-			>&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
-			exit 1
-		fi
-		;;
-	disable)
-		if workspace_search $WORKSPACE; then
-			workspace_disable $WORKSPACE
-			echo $TMP
-		else
-			>&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
-			exit 1
-		fi
-		;;
-	create) workspace_create $WORKSPACE ;;
-	edit) workspace_create $WORKSPACE ;;
-	help) workspace_help && exit 0 ;;
-	*) workspace_help && exit 1 ;;
+    enable)
+        if Workspace.search $WORKSPACE; then
+            Workspace.enable $WORKSPACE
+            export $WORKSPACE
+            echo $TMP
+        else
+            >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
+            exit 1
+        fi
+        ;;
+    disable)
+        if Workspace.search $WORKSPACE; then
+            Workspace.disable $WORKSPACE
+            echo $TMP
+        else
+            >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
+            exit 1
+        fi
+        ;;
+    create) Workspace.create $WORKSPACE ;;
+    edit) Workspace.create $WORKSPACE ;;
+    show) >&2 cat $WORKSPACE_DIR/$WORKSPACE ;;
+    delete) Workspace.delete $WORKSPACE ;;
+    help) Workspace.usage && exit 0 ;;
+    *) Workspace.usage && exit 1 ;;
 esac

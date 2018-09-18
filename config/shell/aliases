@@ -1,9 +1,6 @@
 ## Shell Related
-alias ls='ls -G'
 alias md=mkdir
 alias grep='grep --color'
-alias history-clean='history -c && history -w && clear'
-alias get_cert='openssl s_client -connect'
 
 # Python Virtualenv
 alias wo='workspace enable'
@@ -14,11 +11,3 @@ alias gp='git push'
 
 # Arch-related
 alias yaourt='yaourt --noconfirm'
-
-# Applications
-
-# Mac
-alias awk=/usr/local/bin/gawk
-alias git=/usr/local/bin/git
-alias timeout=/usr/local/bin/gtimeout
-alias tar=/usr/local/bin/gtar

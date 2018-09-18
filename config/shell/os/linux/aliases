@@ -1,0 +1,2 @@
+alias history-clean='history -c && history -w && clear'
+alias get_cert='openssl s_client -connect'
