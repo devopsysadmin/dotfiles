@@ -1,5 +1,5 @@
-#!/bin/bash -xe
-## This script setups the routes given the current operating system.
+#!/bin/bash -e
+## This script setups the routes and utilities given the current operating system.
 
 CFG=$HOME/.config
 BIN=$HOME/.local/bin
@@ -52,6 +52,10 @@ SetRoutes(){
 
 ########## MAIN
 SetPlatformDistro
+
+## Directory structure
+mkdir -p $BIN && ln -nfs $PWD/bin/os $BIN/os
+mkdir -p $CFG && ln -nfs $PWD/config/shell $CFG/shell
 
 ## Shell
 Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform

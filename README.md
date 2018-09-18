@@ -7,5 +7,5 @@ This repository tries to collect some scripts which expand zsh and abstract whic
 * some applies to Mac as well
 
 # Use
-- Download this repository, hopefully in your HOME/.local directory
-- Run setup.sh as normal user
+- Download this repository in any folder (ex: $HOME/.cache/dotfiles)
+- Run setup.sh as normal user from the downloaded folder
