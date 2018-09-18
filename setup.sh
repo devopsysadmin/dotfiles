@@ -38,6 +38,17 @@ SetPlatformDistro(){
 	fi
 }
 
+SetRoutes(){
+	local RPATH='$HOME/.local/bin:$HOME/.local/bin/git:$HOME/.local/bin/'${PLATFORM}
+	local SPATH='/usr/local/bin:/usr/local/sbin'
+	if [ -z $DISTRO ]; then
+		echo "export PATH=$RPATH:$SPATH:\$PATH" > $CFG/shell/01_routes
+	else
+		DLPATH='$HOME/.local/bin/'${DISTRO}
+		echo "export PATH=$RPATH:$DLPATH:$SPATH:\$PATH" > $CFG/shell/01_routes
+	fi
+}
+
 
 ########## MAIN
 SetPlatformDistro
@@ -47,7 +58,5 @@ Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
 [[ -z $DISTRO ]] || Link $CFG/shell/os/${DISTRO}/aliases $CFG/shell/aliases_distro
 
 ## Routes
-ln -nfs $CFG/shell/os/${PLATFORM}/01_routes $CFG/shell/01_routes_platform
-[[ -z $DISTRO ]] || Link $CFG/shell/os/${DISTRO}/01_routes $CFG/shell/01_routes_distro
-
+SetRoutes
 
