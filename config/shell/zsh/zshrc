@@ -5,4 +5,4 @@ for src in $HOME/.config/shell/*; do
   [[ ! -d $src ]] && source $src
 done
 
-fortune && echo ''
+which fortune > /dev/null && fortune && echo ''

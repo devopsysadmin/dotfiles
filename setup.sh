@@ -64,3 +64,5 @@ Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
 ## Routes
 SetRoutes
 
+## Enable zshrc
+echo 'source $HOME/.config/shell/zsh/zshrc' > $HOME/.zshrc

@@ -1,3 +1,0 @@
-#!/bin/sh
-for src in ~/.config/shell/*; do [[ -f $src ]] && source $src ; done
-for src in ~/.config/shell/bash/*; do [[ "$(basename $src)" != "bashrc" ]] && source $src; done
