@@ -8,4 +8,4 @@ This repository tries to collect some scripts which expand zsh and abstract whic
 
 # Use
 - Download this repository, hopefully in your HOME/.local directory
-- Include the git and os directories in your PATH environment variable
+- Run setup.sh as normal user
