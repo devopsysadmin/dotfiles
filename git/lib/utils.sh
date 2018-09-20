@@ -13,9 +13,12 @@ git_commit_issue(){
     local _branch="$1" ; shift
     local _opts="$1" ; shift
     local _message="$@"
-    local ISSUE=$(echo "$_branch" |\
-        sed -e 's/^feature\///g' -e 's/develop-//g' |\
-        sed -n 's/\(.*-[0-9]*\)-.*/\1/p')
+    local ISSUE=$(echo "$_branch" | sed -e 's/^feature\///g' -e 's/develop-//g')
+    if [[ $ISSUE =~ NO-ISSUE.* ]]; then
+    	ISSUE="NO-ISSUE"
+    else
+    	ISSUE=$(echo $ISSUE | sed -n 's/\(.*-[0-9]*\)-.*/\1/p')
+    fi
     if [[ $_opts =~ ^-.* ]]; then
         echo -n ''
     else

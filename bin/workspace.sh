@@ -117,7 +117,7 @@ Workspace.create(){
     RUBY=$(Workspace.input 'Ruby' $RUBY)
     NODE=$(Workspace.input 'Node' $NODE)
     NPM=$(Workspace.input 'Npm' $NPM)
-    echo "WORKSPACE=$WORKSPACE" > $f
+    echo "WORKSPACE=$WORKSPACE" > $fn
     echo "PYTHON_SCRIPT=$(Python.find)" >> $fn
     echo "RUBY_SCRIPT=$(Ruby.find)" >> $fn
     echo "NODE_SCRIPT=$(Node.find)" >> $fn
