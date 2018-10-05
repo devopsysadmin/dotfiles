@@ -5,3 +5,4 @@ alias timeout=/usr/local/bin/gtimeout
 alias tar=/usr/local/bin/gtar
 alias date=/usr/local/bin/gdate
 alias sort=/usr/local/bin/gsort
+alias sed=/usr/local/bin/gsed
