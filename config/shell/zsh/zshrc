@@ -4,5 +4,3 @@ source $ZSH/oh-my-zsh.sh
 for src in $HOME/.config/shell/*; do
   [[ ! -d $src ]] && source $src
 done
-
-which fortune > /dev/null && fortune && echo ''
