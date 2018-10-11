@@ -137,6 +137,7 @@ Workspace.delete(){
 
 ACTION=$1
 WORKSPACE=${2:-$WORKSPACE}
+[[ -z $WORKSPACE ]] && WORKSPACE=$(basename ${VIRTUAL_ENV})
 
 case $ACTION in
     enable)
