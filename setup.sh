@@ -43,6 +43,20 @@ Zsh(){
 	Link $PWD/config/shell/zsh/owntheme.zsh-theme $CFG/shell/zsh/oh-my-zsh/themes/owntheme.zsh-theme
 }
 
+OsLinks(){
+	for _custom in $CFG/shell/os/${PLATFORM}/*; do
+		_name=$(basename ${_custom})
+		Link ${_custom} ${CFG}/shell/${_name}_platform
+	done
+
+	if [ ! -z $DISTRO ]; then
+		for _custom in $CFG/shell/os/${PLATFORM}/${DISTRO}/*; do
+			_name=$(basename ${_custom})
+			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
+		done
+	fi
+}
+
 
 ########## MAIN
 SetPlatformDistro
@@ -55,10 +69,9 @@ mkdir -p $BIN && Link $PWD/bin/os $BIN/os
 mkdir -p $CFG/shell/zsh && rsync --exclude=zsh -aH $PWD/config/shell/ $CFG/shell/
 Link $PWD/config/shell/os $CFG/shell/os
 
+
 ## Shell
-Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
-[[ -z $DISTRO ]] || Link $CFG/shell/os/${DISTRO}/aliases $CFG/shell/aliases_distro
-Link $CFG/shell/os/${PLATFORM}/hotkeys $CFG/shell/hotkeys_platform
+OsLinks
 
 ## Routes
 SetRoutes
