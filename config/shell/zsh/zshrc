@@ -2,5 +2,5 @@ export ZSH=$HOME/.config/shell/zsh/oh-my-zsh
 ZSH_THEME="owntheme"
 source $ZSH/oh-my-zsh.sh
 for src in $HOME/.config/shell/*; do
-  [[ ! -d $src ]] && source $src
+  [[ ! -d $src ]] && [[ $src != $HOME/.config/shell/$ZSH_THEME.zsh-theme ]] && source $src
 done
