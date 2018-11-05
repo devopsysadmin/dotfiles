@@ -43,7 +43,7 @@ Zsh(){
 	Link $PWD/config/shell/zsh/owntheme.zsh-theme $CFG/shell/zsh/oh-my-zsh/themes/owntheme.zsh-theme
 }
 
-OsLinks(){
+OsConfigLinks(){
 	for _custom in $CFG/shell/os/${PLATFORM}/*; do
 		_name=$(basename ${_custom})
 		Link ${_custom} ${CFG}/shell/${_name}_platform
@@ -55,6 +55,19 @@ OsLinks(){
 			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
 		done
 	fi
+}
+
+RecurseLink(){
+	local _source_dir="$1"
+	local _dest_dir="$2"
+	for binary in $_source_dir/*; do [[ -f $binary ]] && Link $binary $_dest_dir/$(basename $binary); done
+}
+
+OsBinLinks(){
+	RecurseLink $PWD/bin $BIN
+	RecurseLink $PWD/bin/os/$PLATFORM $BIN
+	[[ -z $DISTRO ]] || RecurseLink $PWD/bin/os/$PLATFORM/$DISTRO $BIN
+	Link $PWD/bin/git $BIN/git
 }
 
 
@@ -71,10 +84,12 @@ Link $PWD/config/shell/os $CFG/shell/os
 
 
 ## Shell
-OsLinks
+OsConfigLinks
+OsBinLinks
 
 ## Routes
 SetRoutes
+
 
 ## Download oh-my-zsh
 Zsh

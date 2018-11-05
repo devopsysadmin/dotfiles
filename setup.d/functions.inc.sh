@@ -19,6 +19,6 @@ Link(){
 	local _dest="$2"
 	if [ -f $_orig ] || [ -d $_orig ]; then
 		rm -fR "${_dest}"
-		ln -s "${_orig}" "${_dest}"
 	fi
+	ln -s "${_orig}" "${_dest}"
 }
