@@ -1,5 +1,4 @@
 .DS_Store
-config/shell/aliases_*
+config/shell/*_platform*
 config/shell/01_routes
 config/shell/zsh/oh-my-zsh
-config/shell/hotkeys_*
