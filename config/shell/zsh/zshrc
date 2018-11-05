@@ -1,4 +1,4 @@
-export ZSH=$HOME/.config/zsh
+export ZSH=$HOME/.config/shell/zsh/oh-my-zsh
 ZSH_THEME="owntheme"
 source $ZSH/oh-my-zsh.sh
 for src in $HOME/.config/shell/*; do

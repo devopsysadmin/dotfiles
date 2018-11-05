@@ -7,7 +7,7 @@ PLATFORM=
 DISTRO=
 
 
-Link(){ local _orig="$1" ; local _dest="$2" ; [[ -f $_orig ]] && ln -nfs "$_orig" "$_dest" || rm -f "$_dest" ;}
+Link(){ local _orig="$1" ; local _dest="$2" ; rm -fR "${_dest}" ; ln -nfs "${_orig}" "${_dest}" ; }
 
 YesNo(){
 	local _msg=$1
@@ -49,13 +49,28 @@ SetRoutes(){
 	fi
 }
 
+Zsh(){
+	echo -n "Getting/Updating oh-my-zsh... "
+	Link $PWD/config/shell/zsh $CFG/shell/zsh
+	if [ -d $CFG/shell/zsh/oh-my-zsh ]; then
+		git -C $CFG/shell/zsh/oh-my-zsh pull
+	else
+		git -C $CFG/shell/zsh clone https://github.com/robbyrussell/oh-my-zsh
+	fi
+	Link $PWD/config/shell/zsh/owntheme.zsh-theme $CFG/shell/zsh/oh-my-zsh/themes/owntheme.zsh-theme
+}
+
 
 ########## MAIN
 SetPlatformDistro
 
+## Download Utilities
+YesNo "Install Utilities" N && $PWD/setup/${PLATFORM}${DISTRO}.sh
+
 ## Directory structure
-mkdir -p $BIN && ln -nfs $PWD/bin/os $BIN/os
-mkdir -p $CFG && ln -nfs $PWD/config/shell $CFG/shell
+mkdir -p $BIN && Link $PWD/bin/os $BIN/os
+mkdir -p $CFG/shell/zsh && rsync --exclude=zsh -aH $PWD/config/shell/ $CFG/shell/
+Link $PWD/config/shell/os $CFG/shell/os
 
 ## Shell
 Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
@@ -63,6 +78,9 @@ Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
 
 ## Routes
 SetRoutes
+
+## Download oh-my-zsh
+Zsh
 
 ## Enable zshrc
 echo 'source $HOME/.config/shell/zsh/zshrc' > $HOME/.zshrc
