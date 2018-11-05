@@ -2,3 +2,4 @@
 config/shell/aliases_*
 config/shell/01_routes
 config/shell/zsh/oh-my-zsh
+config/shell/hotkeys_*

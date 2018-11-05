@@ -1,29 +1,12 @@
 #!/bin/bash -e
 ## This script setups the routes and utilities given the current operating system.
+export SETUP_DIR=$PWD/setup.d
 
 CFG=$HOME/.config
 BIN=$HOME/.local/bin
 PLATFORM=
 DISTRO=
-
-
-Link(){ local _orig="$1" ; local _dest="$2" ; rm -fR "${_dest}" ; ln -nfs "${_orig}" "${_dest}" ; }
-
-YesNo(){
-	local _msg=$1
-	local _default=${2:-'Y'}
-	local _yes='y'
-	local _no='n'
-	[[ ${_default} == 'Y' ]] && _yes='Y'
-	[[ ${_default} == 'N' ]] && _no='N'
-	>&2 echo -n "$_msg (${_yes}/${_no})? " ; read OPT
-	[[ -z $OPT ]] && OPT=${_default}
-	if [ "$OPT" == 'Y' ] || [ "$OPT" == 'y' ]; then
-		return 0
-	else
-		return 1
-	fi
-}
+source $SETUP_DIR/functions.inc.sh
 
 SetPlatformDistro(){
 	PLATFORM=$(python -m platform | cut -d "-" -f 1 | tr -s '[:upper:]' '[:lower:]')
@@ -65,7 +48,7 @@ Zsh(){
 SetPlatformDistro
 
 ## Download Utilities
-YesNo "Install Utilities" N && $PWD/setup/${PLATFORM}${DISTRO}.sh
+${SETUP_DIR}/${PLATFORM}/setup.sh
 
 ## Directory structure
 mkdir -p $BIN && Link $PWD/bin/os $BIN/os
@@ -75,6 +58,7 @@ Link $PWD/config/shell/os $CFG/shell/os
 ## Shell
 Link $CFG/shell/os/${PLATFORM}/aliases $CFG/shell/aliases_platform
 [[ -z $DISTRO ]] || Link $CFG/shell/os/${DISTRO}/aliases $CFG/shell/aliases_distro
+Link $CFG/shell/os/${PLATFORM}/hotkeys $CFG/shell/hotkeys_platform
 
 ## Routes
 SetRoutes
@@ -83,4 +67,8 @@ SetRoutes
 Zsh
 
 ## Enable zshrc
-echo 'source $HOME/.config/shell/zsh/zshrc' > $HOME/.zshrc
+cat << EOF > $HOME/.zshrc
+export OS=$PLATFORM
+export FLAVOUR=$DISTRO
+source \$HOME/.config/shell/zsh/zshrc
+EOF
