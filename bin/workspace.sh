@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 WORKSPACE_DIR=$HOME/.config/workspaces
 TMP="/tmp/$(date +workspace.%s)"
 
@@ -12,19 +12,6 @@ Workspace.usage(){
     ACTION - enable|disable|create|edit|delete
     WORKSPACE - name of the workspace to run
     '
-}
-
-Workspace.enable(){
-    echo '#!/bin/bash' > $TMP
-    source $WORKSPACE_DIR/$WORKSPACE
-    echo "WORKSPACE=$WORKSPACE" >> $TMP
-    echo "source $PYTHON_SCRIPT" >> $TMP
-    echo "source $RUBY_SCRIPT" >> $TMP
-    echo "source $NODE_SCRIPT" >> $TMP
-    [[ -z $PYTHON ]] && PYTHON=3 ; Python.enable $PYTHON $1 >> $TMP
-    [[ -z $RUBY ]] || Ruby.enable $RUBY >> $TMP
-    if [ $NODE ] || [ $NPM ]; then Node.enable $NODE $NPM >> $TMP; fi
-    echo 'rm -f $0' >> $TMP
 }
 
 Python.find(){
@@ -42,11 +29,12 @@ Python.enable(){
     local _pybin=$(which python$_pyver)
     local _ws=$2
     echo "echo Using python$_pyver in $_ws virtualenv"
-    echo "workon $_ws || mkvirtualenv -p $_pybin $_ws"
+    echo "workon $_ws || mkvirtualenv --no-download -p $_pybin $_ws"
 }
 
 Python.disable(){
     echo "deactivate"
+    echo "unset WS_PYTHON"
 }
 
 Python.delete(){
@@ -67,13 +55,17 @@ Node.find(){
 Node.enable(){
     local _node=$1
     local _npm=$2
-    echo "nvm use v$_node
-    npm_current=\$(npm -v)
-    [[ \$npm_current != '$_npm' ]] && npm install -g npm@$_npm"
+    [[ $_node != 'stable' ]] && _node="v$_node"
+    echo "export WS_NODE=$_node"
+    echo "export WS_NPM=$_npm"
+    echo "nvm use $_node"
+    echo "npm_current=\$(npm -v)"
+    echo "[[ \$npm_current != '$_npm' ]] && npm install -g npm@$_npm"
 }
 
 Node.disable(){
-    echo "nvm use default"
+    echo "[[ -z \$WS_NODE ]] || nvm use default"
+    echo "unset WS_NODE"
 }
 
 Ruby.find(){
@@ -86,18 +78,33 @@ Ruby.find(){
 }
 
 Ruby.enable(){
+    echo "export WS_RUBY=$1"
     echo "rvm use $1 || (rvm install $1 && rvm use $1)"
 }
 
 Ruby.disable(){
-    echo "rvm use system"
+    echo "[[ -z \$WS_RUBY ]] || rvm use system"
+    echo "unset WS_RUBY"
+}
+
+Workspace.enable(){
+    echo '#!/bin/bash' > $TMP
+    source $WORKSPACE_DIR/$WORKSPACE
+    echo "source $PYTHON_SCRIPT" >> $TMP
+    echo "source $RUBY_SCRIPT" >> $TMP
+    echo "source $NODE_SCRIPT" >> $TMP
+    echo "export WORKSPACE=$WORKSPACE" >> $TMP
+    Python.enable $WS_PYTHON $WORKSPACE >> $TMP
+    [[ -z $WS_RUBY ]] || Ruby.enable $WS_RUBY >> $TMP
+    if [ $WS_NODE ] && [ $WS_NPM ]; then Node.enable $WS_NODE $WS_NPM >> $TMP; fi
+    echo 'rm -f $0' >> $TMP
 }
 
 Workspace.disable(){
     Node.disable >> $TMP
     Ruby.disable >> $TMP
     Python.disable >> $TMP
-    echo "export WORKSPACE=" >> $TMP
+    echo "unset WORKSPACE" >> $TMP
 }
 
 Workspace.input(){
@@ -114,18 +121,18 @@ Workspace.input(){
 Workspace.create(){
     local fn="$WORKSPACE_DIR/$WORKSPACE"
     [[ -f $fn ]] && source $fn
-    PYTHON=$(Workspace.input "Python (default $PYTHON_DEFAULT)" $PYTHON) ; [[ -z $PYTHON ]] && PYTHON=$PYTHON_DEFAULT
-    RUBY=$(Workspace.input 'Ruby' $RUBY)
-    NODE=$(Workspace.input 'Node' $NODE)
-    NPM=$(Workspace.input 'Npm' $NPM)
+    local PYTHON=$(Workspace.input 'Python' $WS_PYTHON) ; [[ -z $PYTHON ]] && PYTHON=$PYTHON_DEFAULT
+    local RUBY=$(Workspace.input 'Ruby' $WS_RUBY)
+    local NODE=$(Workspace.input 'Node' $WS_NODE)
+    local NPM=$(Workspace.input 'Npm' $WS_NPM)
     echo "WORKSPACE=$WORKSPACE" > $fn
     echo "PYTHON_SCRIPT=$(Python.find)" >> $fn
     echo "RUBY_SCRIPT=$(Ruby.find)" >> $fn
     echo "NODE_SCRIPT=$(Node.find)" >> $fn
-    echo "PYTHON=$PYTHON" >> $fn
-    echo "RUBY=$RUBY" >> $fn
-    echo "NODE=$NODE" >> $fn
-    echo "NPM=$NPM" >> $fn
+    echo "WS_PYTHON=${PYTHON}" >> $fn
+    echo "WS_RUBY=$RUBY" >> $fn
+    echo "WS_NODE=$NODE" >> $fn
+    echo "WS_NPM=$NPM" >> $fn
 }
 
 Workspace.search(){
@@ -151,6 +158,7 @@ case $ACTION in
         if Workspace.search $WORKSPACE; then
             Workspace.enable $WORKSPACE
             export $WORKSPACE
+            >&2 cat $TMP
             echo $TMP
         else
             >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
@@ -160,13 +168,14 @@ case $ACTION in
     disable)
         if Workspace.search $WORKSPACE; then
             Workspace.disable $WORKSPACE
+            >&2 cat $TMP
             echo $TMP
         else
             >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
             exit 1
         fi
         ;;
-    create) Workspace.create $WORKSPACE ;;
+    create) Workspace.create $WORKSPACE ; Workspace.enable $WORKSPACE ;;
     edit) Workspace.create $WORKSPACE ;;
     show) >&2 cat $WORKSPACE_DIR/$WORKSPACE ;;
     delete) Workspace.delete $WORKSPACE ; echo $TMP ;;
