@@ -15,7 +15,7 @@ Workspace.usage(){
 }
 
 Workspace.enable(){
-    echo '#!/bin/bash -x' > $TMP
+    echo '#!/bin/bash' > $TMP
     source $WORKSPACE_DIR/$WORKSPACE
     echo "WORKSPACE=$WORKSPACE" >> $TMP
     echo "source $PYTHON_SCRIPT" >> $TMP
@@ -50,7 +50,8 @@ Python.disable(){
 }
 
 Python.delete(){
-    echo 'rm $WORKON_HOME' >> $TMP
+	local _ws=$1
+    echo "rm -fR $WORKON_HOME/$_ws" >> $TMP
 }
 
 Node.find(){
@@ -132,12 +133,18 @@ Workspace.search(){
 }
 
 Workspace.delete(){
-    Python.delete
+	local _ws=$1
+    Python.delete $_ws
+    rm $WORKSPACE_DIR/$_ws
+}
+
+Workspace.list(){
+	ls -1 $WORKSPACE_DIR
 }
 
 ACTION=$1
 WORKSPACE=${2:-$WORKSPACE}
-[[ -z $WORKSPACE ]] && WORKSPACE=$(basename ${VIRTUAL_ENV})
+[[ -z $WORKSPACE ]] && WORKSPACE=$(basename ${VIRTUAL_ENV} 2>/dev/null)
 
 case $ACTION in
     enable)
@@ -162,7 +169,8 @@ case $ACTION in
     create) Workspace.create $WORKSPACE ;;
     edit) Workspace.create $WORKSPACE ;;
     show) >&2 cat $WORKSPACE_DIR/$WORKSPACE ;;
-    delete) Workspace.delete $WORKSPACE ;;
+    delete) Workspace.delete $WORKSPACE ; echo $TMP ;;
     help) Workspace.usage && exit 0 ;;
+	list) >&2 Workspace.list ;;
     *) Workspace.usage && exit 1 ;;
 esac
