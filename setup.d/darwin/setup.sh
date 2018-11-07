@@ -32,10 +32,23 @@ InstallNvm(){
 	RestoreProfile
 }
 
+InstallPython(){
+	which python2 || brew install python2
+	which python3 || brew install python3
+	pip2 install virtualenvwrapper
+	pip3 install virtualenvwrapper
+}
+
+InstallBrew(){
+	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+}
+
 
 ######## MAIN
 mkdir -p $TMP
+YesNo "Install brew" N && InstallBrew
+YesNo "Brew Install Utilities" N && $SETUP_DIR/darwin/packages.sh
+YesNo "Install python (2,3)" N && InstallPython
 YesNo "Install rvm" N && InstallRvm
 YesNo "Install nvm" N && InstallNvm
-YesNo "Install Utilities" N && $SETUP_DIR/darwin/packages.sh
 rm -fR $TMP
