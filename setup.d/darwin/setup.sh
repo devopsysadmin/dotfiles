@@ -5,9 +5,9 @@ TMP=/tmp/$(whoami).setup
 ###########
 
 BackupProfile(){
-	for fn in .bash_profile .zshrc
+	for fn in .bash_profile .zshrc .profile .zlogin .mkshrc
 	do
-		cp $HOME/$fn $TMP/$fn
+		[[ -f $fn ]] && cp $HOME/$fn $TMP/$fn
 	done
 }
 

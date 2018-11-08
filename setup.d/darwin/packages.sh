@@ -1,3 +1,5 @@
 #!/bin/sh
 brew install \
-	coreutils
+	coreutils \
+	npm
+
