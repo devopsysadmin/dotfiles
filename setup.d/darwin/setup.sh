@@ -2,17 +2,23 @@
 SETUP_DIR=${SETUP_DIR:-${PWD%'/darwin'}}
 source $SETUP_DIR/functions.inc.sh
 TMP=/tmp/$(whoami).setup
+PROFILES='.bash_profile .zshrc .profile .zlogin .mkshrc'
 ###########
 
 BackupProfile(){
-	for fn in .bash_profile .zshrc .profile .zlogin .mkshrc
-	do
+	for fn in $PROFILES; do
 		[[ -f $fn ]] && cp $HOME/$fn $TMP/$fn
 	done
 }
 
 RestoreProfile(){
-	mv $TMP/.* $HOME/
+	for fn in $PROFILES; do
+		if [ -f $fn ]; then
+			mv $TMP/$fn $HOME/$fn
+		else
+			rm -f $HOME/$fn
+		fi
+	done
 }
 
 InstallRvm(){
