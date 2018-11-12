@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 WORKSPACE_DIR=$HOME/.config/workspaces
 TMP="/tmp/$(date +workspace.%s)"
 
@@ -158,7 +158,7 @@ case $ACTION in
         if Workspace.search $WORKSPACE; then
             Workspace.enable $WORKSPACE
             export $WORKSPACE
-            >&2 cat $TMP
+            # >&2 cat $TMP
             echo $TMP
         else
             >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
