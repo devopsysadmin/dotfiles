@@ -6,3 +6,4 @@ alias tar=/usr/local/bin/gtar
 alias date=/usr/local/bin/gdate
 alias sort=/usr/local/bin/gsort
 alias sed=/usr/local/bin/gsed
+alias grep=/usr/local/bin/ggrep
