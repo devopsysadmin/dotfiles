@@ -58,3 +58,6 @@ YesNo "Install python (2,3)" N && InstallPython
 YesNo "Install rvm" N && InstallRvm
 YesNo "Install nvm" N && InstallNvm
 rm -fR $TMP
+
+mkdir -p ~/Library/KeyBindings
+cp $SETUP_DIR/../config/tools/KeyBindings/DefaultKeyBinding.dict ~/Library/KeyBindings
