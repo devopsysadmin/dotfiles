@@ -9,5 +9,6 @@ alias wf='workspace disable'
 # Git
 alias gp='git push'
 
-# Arch-related
-alias yaourt='yaourt --noconfirm'
+# Package Manager Wrapper
+alias pkg='pkg -o console'
+
