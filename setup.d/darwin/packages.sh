@@ -1,4 +1,4 @@
 #!/bin/sh
 brew install \
-	coreutils grep \
+	coreutils grep findutils\
 	npm
