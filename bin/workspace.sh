@@ -168,7 +168,6 @@ case $ACTION in
     disable)
         if Workspace.search $WORKSPACE; then
             Workspace.disable $WORKSPACE
-            >&2 cat $TMP
             echo $TMP
         else
             >&2 echo "$WORKSPACE not found in $WORKSPACE_DIR"
