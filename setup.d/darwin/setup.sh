@@ -49,11 +49,17 @@ InstallBrew(){
 	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 }
 
+InstallPackages(){
+	for fn in system cask; do
+		brew install "$(cat $SETUP_DIR/darwin/$fn.pkglist)" || break
+	done
+}
+
 
 ######## MAIN
 mkdir -p $TMP
 YesNo "Install brew" N && InstallBrew
-YesNo "Brew Install Utilities" N && $SETUP_DIR/darwin/packages.sh
+YesNo "Brew Install Utilities" N && InstallPackages
 YesNo "Install python (2,3)" N && InstallPython
 YesNo "Install rvm" N && InstallRvm
 YesNo "Install nvm" N && InstallNvm
