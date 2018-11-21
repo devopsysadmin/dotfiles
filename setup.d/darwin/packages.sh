@@ -4,5 +4,5 @@ brew install \
 	npm
 
 brew cask install \
-	keka
-
+	keka \
+	docker
