@@ -3,6 +3,7 @@ SETUP_DIR=${SETUP_DIR:-${PWD%'/darwin'}}
 source $SETUP_DIR/functions.inc.sh
 TMP=/tmp/$(whoami).setup
 PROFILES='.bash_profile .zshrc .profile .zlogin .mkshrc'
+BREW=/usr/local/bin/brew
 ###########
 
 BackupProfile(){
@@ -39,19 +40,20 @@ InstallNvm(){
 }
 
 InstallPython(){
-	which python2 || brew install python2
-	which python3 || brew install python3
+	which python2 || $BREW install python2
+	which python3 || $BREW install python3
 	pip2 install virtualenvwrapper
 	pip3 install virtualenvwrapper
 }
 
 InstallBrew(){
 	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	$BREW tap caskroom/versions
 }
 
 InstallPackages(){
 	for fn in system cask; do
-		brew install "$(cat $SETUP_DIR/darwin/$fn.pkglist)" || break
+		$BREW install "$(cat $SETUP_DIR/darwin/$fn.pkglist)" || break
 	done
 }
 
