@@ -74,8 +74,9 @@ OsBinLinks(){
 ########## MAIN
 SetPlatformDistro
 
-## Download Utilities
-${SETUP_DIR}/${PLATFORM}/setup.sh
+## Distro packages
+SETUP_SH={SETUP_DIR}/${PLATFORM}/setup.sh
+[[ -f ${SETUP_SH} ]] && ${SETUP_SH}
 
 ## Directory structure
 mkdir -p $BIN && Link $PWD/bin/os $BIN/os
