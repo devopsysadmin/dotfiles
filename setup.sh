@@ -49,12 +49,11 @@ OsConfigLinks(){
 		Link ${_custom} ${CFG}/shell/${_name}_platform
 	done
 
-	if [ ! -z $DISTRO ]; then
-		for _custom in $CFG/shell/os/${PLATFORM}/${DISTRO}/*; do
-			_name=$(basename ${_custom})
-			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
-		done
-	fi
+# TODO: Review this part
+#		for _custom in $CFG/shell/os/${PLATFORM}/${DISTRO}/*; do
+#			_name=$(basename ${_custom})
+#			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
+#		done
 }
 
 RecurseLink(){

@@ -20,5 +20,5 @@ Link(){
 	if [ -f $_orig ] || [ -d $_orig ]; then
 		rm -fR "${_dest}"
 	fi
-	ln -s "${_orig}" "${_dest}"
+	ln -nfs "${_orig}" "${_dest}"
 }
