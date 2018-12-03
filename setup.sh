@@ -49,12 +49,11 @@ OsConfigLinks(){
 		Link ${_custom} ${CFG}/shell/${_name}_platform
 	done
 
-	if [ ! -z $DISTRO ]; then
-		for _custom in $CFG/shell/os/${PLATFORM}/${DISTRO}/*; do
-			_name=$(basename ${_custom})
-			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
-		done
-	fi
+# TODO: Review this part
+#		for _custom in $CFG/shell/os/${PLATFORM}/${DISTRO}/*; do
+#			_name=$(basename ${_custom})
+#			Link ${_custom} ${CFG}/shell/${_name}_platform_distro
+#		done
 }
 
 RecurseLink(){
@@ -74,8 +73,9 @@ OsBinLinks(){
 ########## MAIN
 SetPlatformDistro
 
-## Download Utilities
-${SETUP_DIR}/${PLATFORM}/setup.sh
+## Distro packages
+SETUP_SH={SETUP_DIR}/${PLATFORM}/setup.sh
+[[ -f ${SETUP_SH} ]] && ${SETUP_SH}
 
 ## Directory structure
 mkdir -p $BIN && Link $PWD/bin/os $BIN/os
