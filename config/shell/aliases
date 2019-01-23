@@ -1,6 +1,7 @@
 ## Shell Related
 alias md=mkdir
 alias grep='grep --color'
+alias cat=bat
 
 # Python Virtualenv
 alias wo='workspace enable'
