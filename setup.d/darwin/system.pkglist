@@ -1,4 +1,5 @@
 coreutils
 grep
 findutils
-npm
+bat
+nvm
