@@ -33,6 +33,7 @@ Python.enable(){
 }
 
 Python.disable(){
+    echo 'for varname in $(export | egrep "^VIRTUALENVWRAPPER_" | cut -d "=" -f1); do unset $varname; done'
     echo "deactivate"
     echo "unset WS_PYTHON"
 }
@@ -65,6 +66,7 @@ Node.enable(){
 
 Node.disable(){
     echo "[[ -z \$WS_NODE ]] || nvm use default"
+    echo 'for varname in $(export | egrep "^(NVM_)" | cut -d "=" -f1); do unset $varname; done'
     echo "unset WS_NODE"
 }
 
@@ -84,6 +86,8 @@ Ruby.enable(){
 
 Ruby.disable(){
     echo "[[ -z \$WS_RUBY ]] || rvm use system"
+    echo 'for varname in $(export | egrep "^(rvm_|GEM_|MY_RUBY_)" | cut -d "=" -f1); do unset $varname; done'
+    echo 'for varname in ; do unset $varname; done'
     echo "unset WS_RUBY"
 }
 
@@ -93,6 +97,7 @@ Workspace.enable(){
     echo "source $PYTHON_SCRIPT" >> $TMP
     echo "source $RUBY_SCRIPT" >> $TMP
     echo "source $NODE_SCRIPT" >> $TMP
+    echo "export OLD_PATH=$PATH" >> $TMP
     echo "export WORKSPACE=$WORKSPACE" >> $TMP
     Python.enable $WS_PYTHON $WORKSPACE >> $TMP
     [[ -z $WS_RUBY ]] || Ruby.enable $WS_RUBY >> $TMP
@@ -104,6 +109,8 @@ Workspace.disable(){
     Node.disable >> $TMP
     Ruby.disable >> $TMP
     Python.disable >> $TMP
+    echo "export PATH=$OLD_PATH" >> $TMP
+    echo "unset OLD_PATH" >> $TMP
     echo "unset WORKSPACE" >> $TMP
 }
 
