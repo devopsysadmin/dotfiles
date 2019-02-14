@@ -3,3 +3,5 @@ grep
 findutils
 bat
 nvm
+nano
+htop
