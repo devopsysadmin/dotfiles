@@ -7,7 +7,7 @@ while read line; do
   commit=$(echo "$line" | cut -d ' ' -f1)
   comment=$(echo "$line" | cut -d ' ' -f2- )
   [[ $prev -gt 0 ]] && break
-  [[ "$comment" != "_" ]] && prev=1
+  [[ $comment =~ '^_.*' ]] && prev=1
 done < $TMP
 rm $TMP
 
