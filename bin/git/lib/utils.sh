@@ -43,6 +43,8 @@ git_fetch_prune_local(){ git branch -vv | grep 'gone]' | awk '{print $1}' | xarg
 
 git_commit_dirty(){ git add -A . && git commit -m "_$(date +%s)" && git push ;}
 
+git_push_force(){ git push --force ;}
+
 BRANCH="$(git_current_branch)"
 case $(basename $0) in
     gbc) echo "$BRANCH" ;;
@@ -55,4 +57,5 @@ case $(basename $0) in
     gco) git checkout $@ ;;
     gfp) git_fetch_prune_local ;;
 	gcd) git_commit_dirty ;;
+	gpf) git_push_force ;;
 esac
