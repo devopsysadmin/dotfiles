@@ -2,7 +2,7 @@
 from argparse import ArgumentParser
 from configparser import ConfigParser
 import os
-from subprocess import call
+from subprocess import call, PIPE, check_output
 import sys
 
 config = ConfigParser()
@@ -19,6 +19,14 @@ def get_branch():
         ref = fn.read()
     return ref.strip().replace('ref: refs/heads/', '')
 
+def get_instead_of(urlparts):
+    schema = urlparts[0]
+    contents = check_output(['git', 'config', '-l']).decode('UTF8').split('\n')
+    for line in contents:
+        if '.insteadof=%s' %schema in line:
+            insteadof = line.replace('url.', '').replace('/.insteadof=%s//' %schema, '')
+            return ('/'.join([insteadof] + list(filter(None, urlparts[1:])) ))
+
 
 def get_url():
     gitconfig = '.git/config'
@@ -26,7 +34,13 @@ def get_url():
     if os.path.exists(gitconfig):
         with open(gitconfig, 'r') as fn:
             config.read(gitconfig)
-    (schema, url, context, project, repo) = config.get('remote "origin"', 'url'
+    urlconfig = config.get('remote "origin"', 'url')
+    urlparts = urlconfig.split('/')
+    if urlparts[0] in ('http:', 'https:', 'ssh:'):
+        url = urlconfig
+    else:
+        url = get_instead_of(urlparts)
+    schema, url, context, project, repo = ( url 
                                             ).replace(':7999', '/bitbucket'
                                             ).replace('ssh://git@', 'https:/'
                                             ).replace('.git', ''
@@ -37,7 +51,7 @@ def get_url():
                         context = context,
                         project = project.upper(),
                         repo = repo
-            )
+                        )
 
 def open_browser(pullrequest):
     url = get_url()
