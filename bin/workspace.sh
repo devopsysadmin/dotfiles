@@ -151,6 +151,7 @@ Workspace.list(){
 
 ACTION=$1
 WORKSPACE=${2:-$WORKSPACE}
+mkdir -p $WORKSPACE_DIR
 [[ -z $WORKSPACE ]] && WORKSPACE=$(basename ${VIRTUAL_ENV} 2>/dev/null)
 
 case $ACTION in
