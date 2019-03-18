@@ -4,6 +4,16 @@ TMP="/tmp/$(date +workspace.%s)"
 
 PYTHON_DEFAULT=3
 
+GetOs(){
+	local _sys_os=${OS:$(uname)}
+	local _os=
+	case $_sys_os in
+		darwin|Darwin|osx) _os='osx' ;;
+		linux|Linux) _os='linux' ;;
+	esac
+	echo $_os
+}
+
 Workspace.usage(){
     >&2 echo '
     Enables|Disables python+ruby+node versions for a given workspace
@@ -28,11 +38,18 @@ Python.enable(){
 	local _pyver=$1
     local _pybin=$(which python$_pyver)
     local _ws=$2
+    local _distutils_real="$HOME/.pydistutils.cfg"
+    local _distutils_tmp="/tmp/$(basename $HOME).pydistutils.cfg"
     echo "echo Using python$_pyver in $_ws virtualenv"
-    echo "workon $_ws || mkvirtualenv --no-download -p $_pybin $_ws"
+    echo "workon $_ws || ( 
+    	[[ $(GetOs) == 'osx' ]] && [[ -f $_distutils_real ]] && mv $_distutils_real $_distutils_tmp
+    	mkvirtualenv --no-download -p $_pybin $_ws
+    	[[ -f $_distutils_tmp ]] && mv $_distutils_tmp $_distutils_real
+    )"
 }
 
 Python.disable(){
+    echo 'for varname in $(export | egrep "^VIRTUALENVWRAPPER_" | cut -d "=" -f1); do unset $varname; done'
     echo "deactivate"
     echo "unset WS_PYTHON"
 }
@@ -65,6 +82,7 @@ Node.enable(){
 
 Node.disable(){
     echo "[[ -z \$WS_NODE ]] || nvm use default"
+    echo 'for varname in $(export | egrep "^(NVM_)" | cut -d "=" -f1); do unset $varname; done'
     echo "unset WS_NODE"
 }
 
@@ -84,6 +102,8 @@ Ruby.enable(){
 
 Ruby.disable(){
     echo "[[ -z \$WS_RUBY ]] || rvm use system"
+    echo 'for varname in $(export | egrep "^(rvm_|GEM_|MY_RUBY_)" | cut -d "=" -f1); do unset $varname; done'
+    echo 'for varname in ; do unset $varname; done'
     echo "unset WS_RUBY"
 }
 
@@ -93,6 +113,7 @@ Workspace.enable(){
     echo "source $PYTHON_SCRIPT" >> $TMP
     echo "source $RUBY_SCRIPT" >> $TMP
     echo "source $NODE_SCRIPT" >> $TMP
+    echo "export OLD_PATH=$PATH" >> $TMP
     echo "export WORKSPACE=$WORKSPACE" >> $TMP
     Python.enable $WS_PYTHON $WORKSPACE >> $TMP
     [[ -z $WS_RUBY ]] || Ruby.enable $WS_RUBY >> $TMP
@@ -104,6 +125,8 @@ Workspace.disable(){
     Node.disable >> $TMP
     Ruby.disable >> $TMP
     Python.disable >> $TMP
+    echo "export PATH=$OLD_PATH" >> $TMP
+    echo "unset OLD_PATH" >> $TMP
     echo "unset WORKSPACE" >> $TMP
 }
 

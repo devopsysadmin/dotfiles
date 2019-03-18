@@ -98,5 +98,9 @@ Zsh
 cat << EOF > $HOME/.zshrc
 export OS=$PLATFORM
 export FLAVOUR=$DISTRO
+export BAT_CONFIG_PATH=$HOME/.config/bat
 source \$HOME/.config/shell/zsh/zshrc
 EOF
+
+## Application utilities
+Link $PWD/config/tools/bat $HOME/.config/bat
