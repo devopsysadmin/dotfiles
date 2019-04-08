@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Find GNU/xargs binary
-xargs=$(which gxargs)
+xargs=$(which gxargs 2>/dev/null)
 [[ -z $xargs ]] && xargs=$(which xargs)
 
 VOLUMES=$(docker volume ls -qf dangling=true)
