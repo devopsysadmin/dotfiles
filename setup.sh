@@ -74,7 +74,7 @@ OsBinLinks(){
 SetPlatformDistro
 
 ## Distro packages
-SETUP_SH={SETUP_DIR}/${PLATFORM}/setup.sh
+SETUP_SH=${SETUP_DIR}/${PLATFORM}/setup.sh
 [[ -f ${SETUP_SH} ]] && ${SETUP_SH}
 
 ## Directory structure

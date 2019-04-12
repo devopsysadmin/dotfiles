@@ -53,7 +53,7 @@ InstallBrew(){
 
 InstallPackages(){
 	for fn in system cask; do
-		$BREW install "$(cat $SETUP_DIR/darwin/$fn.pkglist)" || break
+		$BREW install $(cat $SETUP_DIR/darwin/$fn.pkglist) || break
 	done
 }
 
