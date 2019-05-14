@@ -1,15 +1,37 @@
-#!/bin/bash
-TMP="/tmp/git_fixup_$(date +%s)"
-git log --oneline --no-decorate -n50 > $TMP
-prev=0
+#!/usr/bin/env python
+from subprocess import call, Popen, PIPE
+from shlex import split
+import re
 
-while read line; do
-  commit=$(echo "$line" | cut -d ' ' -f1)
-  comment=$(echo "$line" | cut -d ' ' -f2- )
-  [[ $prev -gt 0 ]] && break
-  [[ $comment =~ '^_.*' ]] && prev=1
-done < $TMP
-rm $TMP
+def get_log():
+    cmd = split('git log --oneline --no-decorate -n100')
+    p = Popen(cmd, stdout=PIPE)
+    stdout, _ = p.communicate()
+    return stdout.decode('utf-8')
 
-echo $commit
-git rebase -i $commit && git push --force
+def matches(comment):
+    m = re.search(r'^_\d+:\d+$', comment)
+    return True if m else False
+
+def rebase(commit):
+    cmd = split('git rebase -i %s' %commit)
+    call(cmd)
+    
+
+
+if __name__ == '__main__':
+    found = False
+    for line in get_log().split('\n'):
+        splitted = line.split(' ')
+        commit = splitted[0]
+        comment = ' '.join(splitted[1:])
+        if(found):
+            if matches(comment):
+                continue
+            else:
+                rebase(commit) # rebase from previous commit found
+                break
+        if matches(comment):
+            found = True
+
+
