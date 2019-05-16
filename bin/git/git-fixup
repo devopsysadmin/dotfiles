@@ -10,7 +10,7 @@ def get_log():
     return stdout.decode('utf-8')
 
 def matches(comment):
-    m = re.search(r'^_\d+:\d+$', comment)
+    m = re.search(r'^_\d+_\d+$', comment)
     return True if m else False
 
 def rebase(commit):
