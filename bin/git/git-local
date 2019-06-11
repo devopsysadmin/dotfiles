@@ -1,0 +1,12 @@
+#!/bin/sh
+DIR=$(git config local.dir)
+if [ -z $DIR ]; then
+	DEFAULT_GIT=~/.share/git
+	echo -n "Local directory to store bare repositories ($DEFAULT_GIT): "
+	read DIR
+	if [ -z $DIR ]; then DIR=$DEFAULT_GIT; fi
+	git config --global local.dir $DIR
+fi
+
+git init --bare $DIR/$1.git
+git clone $DIR/$1.git
