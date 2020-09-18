@@ -1,0 +1,12 @@
+#!/bin/bash
+
+### Shows a progress bar when creating a tar file
+### Needs pv
+
+PV=$(which pv)
+[[ -z $PV ]] && exit 1
+OPTIONS=$1
+TAR=$2
+FILES="${3:-.}"
+
+tar $OPTIONS - "$FILES" | (pv -p --timer --rate --bytes > $TAR)
