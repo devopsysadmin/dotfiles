@@ -1,0 +1,7 @@
+_ref=$(command git symbolic-ref --quiet HEAD 2> /dev/null)
+_ret=$?
+if [[ $_ret != 0 ]]; then
+    [[ $_ret == 128 ]] && return  # no git repo.
+    _ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
+fi
+echo ${_ref#refs/heads/}
