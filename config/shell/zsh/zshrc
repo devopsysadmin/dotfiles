@@ -1,5 +1,11 @@
 export ZSH=$HOME/.config/shell/zsh/oh-my-zsh
 ZSH_THEME="owntheme"
+
+plugins=(git)
+# gbd and gcd are in zsh-git-plugin and we want ours
+unalias gbd
+unalias gcd
+
 source $ZSH/oh-my-zsh.sh
 [[ $OS == 'darwin' ]] && OS=osx
 [[ -f plugins/$OS/$OS.plugin.zsh ]] && source plugins/$OS/$OS.plugin.zsh
