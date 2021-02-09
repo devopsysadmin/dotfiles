@@ -1,1 +1,2 @@
-lib/utils.sh
+#!/bin/sh
+git push --set-upstream origin "$(git-current-branch)"

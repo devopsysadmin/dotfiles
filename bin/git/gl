@@ -1,1 +1,2 @@
-lib/utils.sh
+#!/bin/sh -e
+git pull $@

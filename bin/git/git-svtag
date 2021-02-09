@@ -1,4 +1,6 @@
 #!/bin/bash
+## Generates SemVer tagging, re-tagging minor
+
 TAG=$(git tag -l --sort=-v:refname | grep -e '^[1-9]' | head -n1)
 MAJOR=$(echo $TAG | cut -d "." -f 1)
 MINOR=$(echo $TAG | cut -d "." -f 2)

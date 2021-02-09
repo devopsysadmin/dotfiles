@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+## Some git calls are symlinks to this file
+## because regex-oriented tasks are easier
+
 import subprocess
 import re
 from sys import argv, exit

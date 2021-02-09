@@ -1,1 +1,7 @@
-lib/utils.sh
+#!/bin/sh
+_gup(){
+    local _branch="$(git-current-branch)"
+    git branch --set-upstream-to "origin/$_branch" "$_branch"
+}
+
+_gup && git pull $@

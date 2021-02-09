@@ -1,6 +1,1 @@
-#!/bin/sh
-ISSUE=$(git-current-branch | sed -e 's/^feature\///g' -e 's/^develop//g'-n 's/\(.*-[0-9]*\)-.*/\1/p')
-if [[ $ISSUE =~ NO-ISSUE.* ]] || [ -z $ISSUE ]; then
-    ISSUE="NO-ISSUE"
-fi
-git commit -am "[$ISSUE] $@"
+git.py
