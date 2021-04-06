@@ -2,9 +2,6 @@ export ZSH=$HOME/.config/shell/zsh/oh-my-zsh
 ZSH_THEME="owntheme"
 
 plugins=(git)
-# gbd and gcd are in zsh-git-plugin and we want ours
-unalias gbd
-unalias gcd
 
 source $ZSH/oh-my-zsh.sh
 [[ $OS == 'darwin' ]] && OS=osx
@@ -12,3 +9,11 @@ source $ZSH/oh-my-zsh.sh
 for src in $HOME/.config/shell/*; do
   [[ ! -d $src ]] && [[ $src != $HOME/.config/shell/$ZSH_THEME.zsh-theme ]] && source $src
 done
+
+# gbd and gcd are in zsh-git-plugin and we want ours
+unalias gbd
+unalias gcd
+
+# for god sake, I want bash'ed asterisk behaviour
+setopt nullglob
+

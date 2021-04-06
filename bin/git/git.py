@@ -7,6 +7,8 @@ import re
 from sys import argv, exit
 import os
 
+issueRegex = r'[A-Z]{2,4}[0-9]{1,3}-\d+'
+
 def get_current_branch(args):
     RE_CURRENT_BRANCH = re.compile(
         r"^[*]"       # Leading "*" denotes the current branch from "git branch" 
@@ -16,10 +18,13 @@ def get_current_branch(args):
     )
     out = subprocess.run(["git", "branch"], capture_output=True, text=True)
     current_branch_full_match = re.search(RE_CURRENT_BRANCH, out.stdout)
-    current_branch = current_branch_full_match.group(1)
-    if not args:
-        print(current_branch)
-    return current_branch
+    if current_branch_full_match:
+        current_branch = current_branch_full_match.group(1)
+        if not args:
+            print(current_branch)
+        return current_branch
+    else:
+        exit('Cannot get current branch. Maybe not inside a repository?')
 
 
 def _git_commit(message):
@@ -30,9 +35,9 @@ def gci(args):
     current_branch_slugs = get_current_branch(True).split('/')
     brackets = 'NO-ISSUE'
     if len(current_branch_slugs) > 1:
-        issue_id = re.search('(\w+)-(\d+)', current_branch_slugs[1])
+        issue_id = re.search(issueRegex, current_branch_slugs[1], re.IGNORECASE)
         if issue_id:
-            brackets = issue_id.group(1)
+            brackets = current_branch_slugs[1]
     _git_commit(f"[{brackets}] {' '.join(args)}")
 
 
